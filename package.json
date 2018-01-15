@@ -10,7 +10,7 @@
     "umd"
   ],
   "scripts": {
-    "start": "node ./node_modules/babel-cli/bin/babel-node ./src/index",
+    "start": "npm run build && node ./lib/index",
     "build": "node ./node_modules/jnwb/lib/bin/nwb build-web-module",
     "clean": "node ./node_modules/jnwb/lib/bin/nwb clean-module",
     "test": "node ./node_modules/jnwb/lib/bin/nwb test",
@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.4",
+    "popform": "^0.1.1",
     "puppeteer": "^1.0.0"
   },
   "devDependencies": {

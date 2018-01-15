@@ -8041,6 +8041,14 @@
         "find-up": "2.1.0"
       }
     },
+    "popform": {
+      "version": "0.1.1",
+      "resolved": "https://registry.npmjs.org/popform/-/popform-0.1.1.tgz",
+      "integrity": "sha512-82yR+1vtVY/42CQXJ5ApMHeqsYI0xDvVzPTQX0MONagJ/gKzNfTb4evnCiM/jalzKR/Bg8Tx2R2Ph4zRO7TQIQ==",
+      "requires": {
+        "lodash": "4.17.4"
+      }
+    },
     "portfinder": {
       "version": "1.0.13",
       "resolved": "https://registry.npmjs.org/portfinder/-/portfinder-1.0.13.tgz",

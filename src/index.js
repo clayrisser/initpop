@@ -5,9 +5,12 @@ const exampleConfig = [
   {
     name: 'something',
     url: 'http://www.aavtrain.com/index.asp',
-    fields: {
-      user_name: 'Bobby',
-      password: 'some password'
+    config: {
+      delay: 0,
+      fields: {
+        user_name: 'Bobby',
+        password: 'some password'
+      }
     }
   }
 ];
@@ -15,25 +18,16 @@ const exampleConfig = [
 Promise.resolve().then(async () => {
 
   const browser = await puppeteer.launch();
-  const promises = _.map(exampleConfig, async (pageConfig) => {
+  const promises = _.map(exampleConfig, async (pageInfo) => {
     const page = await browser.newPage();
-    await page.goto(pageConfig.url);
-    await page.evaluate((pageConfig) => {
-      Object.keys(pageConfig.fields).forEach((fieldName) => {
-        const field = pageConfig.fields[fieldName];
-        document.getElementsByName(fieldName).forEach((element) => {
-          if (typeof field === 'string') {
-            element.value = field;
-          } else {
-            Object.keys(field).forEach((key) => {
-              if (key !== 'name') element[key] = field[key];
-            });
-          }
-        });
-      });
-    }, pageConfig);
-    console.log(`Populated ${pageConfig.name}: ${pageConfig.url}`);
-    await page.screenshot({ path: `${pageConfig.name}.png` })
+    page.on('console', (log) => console[log._type](log._text));
+    await page.goto(pageInfo.url);
+    await page.addScriptTag({ path: './node_modules/popform/umd/popform.min.js'})
+    const boo = await page.evaluate((pageInfo) => {
+      return window.popform(pageInfo.config);
+    }, pageInfo);
+    console.log(`Populated ${pageInfo.name}: ${pageInfo.url}`);
+    await page.screenshot({ path: `${pageInfo.name}.png` })
   });
   await Promise.all(promises);
   await browser.close();

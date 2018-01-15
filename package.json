@@ -18,6 +18,7 @@
     "docker:build": "docker build -t jamrizzi/initpop:latest -f ./Dockerfile ./"
   },
   "dependencies": {
+    "js-yaml": "^3.10.0",
     "lodash": "^4.17.4",
     "popform": "^0.1.1",
     "puppeteer": "^1.0.0"

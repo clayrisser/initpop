@@ -170,7 +170,6 @@
       "version": "1.0.9",
       "resolved": "https://registry.npmjs.org/argparse/-/argparse-1.0.9.tgz",
       "integrity": "sha1-c9g7wmP4bpf4zE9rrhsOkKfSLIY=",
-      "dev": true,
       "requires": {
         "sprintf-js": "1.0.3"
       }
@@ -2638,7 +2637,7 @@
       "dev": true,
       "requires": {
         "is-directory": "0.3.1",
-        "js-yaml": "3.7.0",
+        "js-yaml": "3.10.0",
         "minimist": "1.2.0",
         "object-assign": "4.1.1",
         "os-homedir": "1.0.2",
@@ -5744,7 +5743,7 @@
         "esprima": "2.7.3",
         "glob": "5.0.15",
         "handlebars": "4.0.11",
-        "js-yaml": "3.7.0",
+        "js-yaml": "3.10.0",
         "mkdirp": "0.5.1",
         "nopt": "3.0.6",
         "once": "1.4.0",
@@ -5945,13 +5944,19 @@
       "dev": true
     },
     "js-yaml": {
-      "version": "3.7.0",
-      "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-3.7.0.tgz",
-      "integrity": "sha1-XJZ93YN6m/3KXy3oQlOr6KHAO4A=",
-      "dev": true,
+      "version": "3.10.0",
+      "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-3.10.0.tgz",
+      "integrity": "sha512-O2v52ffjLa9VeM43J4XocZE//WT9N0IiwDa3KSHH7Tu8CtH+1qM8SIZvnsTh6v+4yFy5KUY3BHUVwjpfAWsjIA==",
       "requires": {
         "argparse": "1.0.9",
-        "esprima": "2.7.3"
+        "esprima": "4.0.0"
+      },
+      "dependencies": {
+        "esprima": {
+          "version": "4.0.0",
+          "resolved": "https://registry.npmjs.org/esprima/-/esprima-4.0.0.tgz",
+          "integrity": "sha512-oftTcaMu/EGrEIu904mWteKIv8vMuOgGYo7EhVJJN00R/EED9DCua/xxHRdYnKtcECzVg7xOWhflvJMnqcFZjw=="
+        }
       }
     },
     "jsbn": {
@@ -11446,8 +11451,7 @@
     "sprintf-js": {
       "version": "1.0.3",
       "resolved": "https://registry.npmjs.org/sprintf-js/-/sprintf-js-1.0.3.tgz",
-      "integrity": "sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=",
-      "dev": true
+      "integrity": "sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw="
     },
     "sshpk": {
       "version": "1.13.1",
@@ -11678,6 +11682,18 @@
         "mkdirp": "0.5.1",
         "sax": "1.2.4",
         "whet.extend": "0.9.9"
+      },
+      "dependencies": {
+        "js-yaml": {
+          "version": "3.7.0",
+          "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-3.7.0.tgz",
+          "integrity": "sha1-XJZ93YN6m/3KXy3oQlOr6KHAO4A=",
+          "dev": true,
+          "requires": {
+            "argparse": "1.0.9",
+            "esprima": "2.7.3"
+          }
+        }
       }
     },
     "syntax-error": {

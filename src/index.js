@@ -1,24 +1,16 @@
 import puppeteer from 'puppeteer';
 import _ from 'lodash';
+import yaml from 'js-yaml';
+import fs from 'fs';
 
-const exampleConfig = [
-  {
-    name: 'something',
-    url: 'http://www.aavtrain.com/index.asp',
-    config: {
-      delay: 0,
-      fields: {
-        user_name: 'Bobby',
-        password: 'some password'
-      }
-    }
-  }
-];
-
-Promise.resolve().then(async () => {
-
+new Promise((resolve, reject) => {
+  fs.readFile('./example-config.yml', (err, data) => {
+    if (err) return reject(err);
+    return resolve(yaml.safeLoad(data.toString()));
+  });
+}).then(async (config) => {
   const browser = await puppeteer.launch();
-  const promises = _.map(exampleConfig, async (pageInfo) => {
+  const promises = _.map(config, async (pageInfo) => {
     const page = await browser.newPage();
     page.on('console', (log) => console[log._type](log._text));
     await page.goto(pageInfo.url);
@@ -31,7 +23,6 @@ Promise.resolve().then(async () => {
   });
   await Promise.all(promises);
   await browser.close();
-
 }).catch((err) => {
   console.error(err);
 });

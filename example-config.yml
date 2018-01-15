@@ -1,0 +1,7 @@
+- name: something
+  url: http://www.aavtrain.com/index.asp
+  config:
+    delay: 0
+    fields:
+      user_name: "Some User"
+      password: some-password

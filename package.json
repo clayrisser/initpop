@@ -1,6 +1,6 @@
 {
   "name": "initpop",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Describe initpop here",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -21,6 +21,7 @@
     "docker:build": "docker build -t jamrizzi/initpop:latest -f ./Dockerfile ./"
   },
   "dependencies": {
+    "babel-runtime": "^6.26.0",
     "commander": "^2.13.0",
     "js-yaml": "^3.10.0",
     "lodash": "^4.17.4",

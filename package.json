@@ -1,6 +1,6 @@
 {
   "name": "initpop",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Initialize web applications over a cli",
   "main": "lib/index.js",
   "module": "es/index.js",

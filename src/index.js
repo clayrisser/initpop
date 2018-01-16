@@ -18,11 +18,13 @@ const configPath = path.resolve(commander.args[0]);
 new Promise((resolve, reject) => {
   fs.readFile(configPath, (err, data) => {
     if (err) return reject(err);
-    return resolve(yaml.safeLoad(data.toString()));
+    return resolve(setEnvs(data.toString()));
   });
+}).then((yamlData) => {
+  return yaml.safeLoad(yamlData);
 }).then(async (config) => {
   const browser = await puppeteer.launch();
-  const promises = _.map(config, async (pageInfo) => {
+  for (const pageInfo of config) {
     const page = await browser.newPage();
     page.on('console', (log) => console[log._type](log._text));
     await page.goto(pageInfo.url);
@@ -47,8 +49,7 @@ new Promise((resolve, reject) => {
         config: pageInfo.config
       });
     }
-  });
-  await Promise.all(promises);
+  }
   await browser.close();
 }).catch((err) => {
   console.error(err);
@@ -89,4 +90,26 @@ async function popform({ name, url, delay, page, config }) {
   if (commander.debug) {
     await page.screenshot({ path: `${name}.debug.png` });
   }
+}
+
+function setEnvs(yamlData) {
+  const matches = yamlData.match(/\${((\\})|[^}])*}/g);
+  _.each(matches, (match) => {
+    const env = getEnvFromMatch(match);
+    yamlData = yamlData.replace(match, env);
+  });
+  return yamlData;
+}
+
+function getEnvFromMatch(match) {
+  let envDefault = '';
+  let envName = match.substr(2, match.length - 3);
+  const index = envName.search(/[^\\]:/);
+  if (index > -1) {
+    envDefault = envName.substr(index + 2);
+    envName = envName.substr(0, index + 1);
+  }
+  let env = process.env[envName];
+  if (!env || env.length <= 0) env = envDefault;
+  return env;
 }

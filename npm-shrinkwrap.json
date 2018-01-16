@@ -1,6 +1,6 @@
 {
   "name": "initpop",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -8044,9 +8044,9 @@
       }
     },
     "popform": {
-      "version": "0.1.1",
-      "resolved": "https://registry.npmjs.org/popform/-/popform-0.1.1.tgz",
-      "integrity": "sha512-82yR+1vtVY/42CQXJ5ApMHeqsYI0xDvVzPTQX0MONagJ/gKzNfTb4evnCiM/jalzKR/Bg8Tx2R2Ph4zRO7TQIQ==",
+      "version": "0.1.2",
+      "resolved": "https://registry.npmjs.org/popform/-/popform-0.1.2.tgz",
+      "integrity": "sha512-Q1eTEH1+FmX7WcoiO7kyFvu8nbemX80du7yP43rucWuNrQ8SWjYhrjAhjQqNkh38hEbg77sU4ZgI8aIX3eL94A==",
       "requires": {
         "lodash": "4.17.4"
       }

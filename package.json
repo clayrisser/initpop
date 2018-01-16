@@ -1,12 +1,10 @@
 {
   "name": "initpop",
-  "version": "1.0.2",
-  "description": "Describe initpop here",
+  "version": "1.1.0",
+  "description": "Initialize web applications over a cli",
   "main": "lib/index.js",
   "module": "es/index.js",
-  "bin": {
-    "initpop": "lib/index.js"
-  },
+  "bin": "lib/index.js",
   "files": [
     "es",
     "lib",
@@ -25,7 +23,7 @@
     "commander": "^2.13.0",
     "js-yaml": "^3.10.0",
     "lodash": "^4.17.4",
-    "popform": "^0.1.1",
+    "popform": "^0.1.2",
     "puppeteer": "^1.0.0"
   },
   "devDependencies": {

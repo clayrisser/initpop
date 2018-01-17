@@ -23,10 +23,13 @@ new Promise((resolve, reject) => {
 }).then((yamlData) => {
   return yaml.safeLoad(yamlData);
 }).then(async (config) => {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    /* executablePath: process.env.CHROME_BIN || null,*/
+    /* args: ['--no-sandbox', '--headless', '--disable-gpu']*/
+  });
   for (const pageInfo of config) {
     const page = await browser.newPage();
-    page.on('console', (log) => console[log._type](log._text));
+    page.on('console', (log) => console.log(log));
     await page.goto(pageInfo.url);
     if (_.isArray(pageInfo.config)) {
       let count = 0;
@@ -60,9 +63,7 @@ async function popform({ name, url, delay, page, config }) {
   delete _config.submit;
   delete _config.keys;
   delete _config.click;
-  await page.addScriptTag({
-    path: path.resolve(__dirname, '../node_modules/popform/umd/popform.min.js')
-  })
+  await page.addScriptTag('https://unpkg.com/popform@0.1.2/umd/popform.min.js');
   await page.evaluate((config) => {
     return window.popform(config);
   }, _config);

@@ -63,7 +63,13 @@ async function popform({ name, url, delay, page, config }) {
   delete _config.submit;
   delete _config.keys;
   delete _config.click;
-  await page.addScriptTag('https://unpkg.com/popform@0.1.2/umd/popform.min.js');
+  const scriptUrl = await new Promise((resolve, reject) => {
+    fs.readFile(path.resolve(__dirname, '../node_modules/popform/umd/popform.min.js'), (err, data) => {
+      if (err) return reject(err);
+      return resolve(`data:application/javascript;base64,${data.toString('base64')}`);
+    });
+  });
+  await page.addScriptTag(scriptUrl);
   await page.evaluate((config) => {
     return window.popform(config);
   }, _config);

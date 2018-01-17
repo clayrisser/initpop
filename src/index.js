@@ -101,9 +101,10 @@ async function popform({ name, url, page, config, networkIdleTimeout, waitUntil 
       for (var elementConfig of config.elements || []) {
         const element = contentDocument.querySelector(elementConfig.query);
         if (element) {
+          if (elementConfig.field) element.focus();
           for (var key of Object.keys(elementConfig || {})) {
             value = elementConfig[key];
-            if (key !== 'query') {
+            if (key !== 'query' && key !== 'field') {
               if (elementConfig[key].constructor === Array) {
                 element[key] = element[key].concat(value);
               } else if (typeof elementConfig[key] === 'object') {
@@ -112,6 +113,10 @@ async function popform({ name, url, page, config, networkIdleTimeout, waitUntil 
                 element[key] = value;
               }
             }
+          }
+          if (elementConfig.field) {
+            element.dispatchEvent(new Event('change'));
+            element.blur();
           }
         }
       }

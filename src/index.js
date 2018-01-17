@@ -30,15 +30,21 @@ new Promise((resolve, reject) => {
   for (const pageInfo of config) {
     const page = await browser.newPage();
     page.on('console', (log) => console.log(log));
-    await page.goto(pageInfo.url);
+    const waitUntil = pageInfo.networkIdle ? 'networkidle' : 'load';
+    const networkIdleTimeout = Number(pageInfo.networkIdle) > 1 ? Number(pageInfo.networkIdle) : 1000;
+    await page.goto(pageInfo.url, {
+      waitUntil,
+      networkIdleTimeout
+    });
     if (_.isArray(pageInfo.config)) {
       let count = 0;
       for (const config of pageInfo.config) {
         await popform({
           name: `${pageInfo.name}-${count}`,
           url: pageInfo.url,
-          delay: pageInfo.delay,
           page,
+          waitUntil,
+          networkIdleTimeout,
           config
         });
         count++;
@@ -58,38 +64,90 @@ new Promise((resolve, reject) => {
   console.error(err);
 });
 
-async function popform({ name, url, delay, page, config }) {
-  const _config = _.clone(config);
-  delete _config.submit;
-  delete _config.keys;
-  delete _config.click;
-  await page.injectFile(path.resolve(__dirname, '../node_modules/popform/umd/popform.min.js'));
+async function popform({ name, url, page, config, networkIdleTimeout, waitUntil }) {
+  if (commander.debug) {
+    await page.screenshot({ path: `${name}.before.debug.png` });
+  }
   await page.evaluate((config) => {
-    return window.popform(config);
-  }, _config);
+    eval(`
+      var contentDocument = document;
+      if (config.iframe) contentDocument = document.querySelector(config.iframe).contentDocument;
+      for (var key of Object.keys(config.fields || {})) {
+        field = config.fields[key];
+        for (var element of contentDocument.getElementsByName(key)) {
+          element.focus();
+          if (element.type === 'checkbox') {
+            element.checked = !!value;
+          } else {
+            if (typeof field === 'string') {
+              element.value = field;
+            } else {
+              for (var key of Object.keys(field || {})) {
+                var value = field[key];
+                if (elementConfig[key].constructor === Array) {
+                  element[key] = element[key].concat(value);
+                } else if (typeof element[key] === 'object') {
+                  Object.assign(element[key], value);
+                } else {
+                  element[key] = value;
+                }
+              }
+            }
+          }
+          element.dispatchEvent(new Event('change'));
+          element.blur();
+        }
+      }
+      for (var elementConfig of config.elements || []) {
+        const element = contentDocument.querySelector(elementConfig.query);
+        if (element) {
+          for (var key of Object.keys(elementConfig || {})) {
+            value = elementConfig[key];
+            if (key !== 'query') {
+              if (elementConfig[key].constructor === Array) {
+                element[key] = element[key].concat(value);
+              } else if (typeof elementConfig[key] === 'object') {
+                Object.assign(element[key], value);
+              } else {
+                element[key] = value;
+              }
+            }
+          }
+        }
+      }
+      if (config.click) {
+        if (typeof config.click === 'string') {
+          contentDocument.querySelector(config.click).click();
+        } else {
+          for (const query of config.click) {
+            contentDocument.querySelector(query).click();
+          }
+        }
+      }
+    `)
+  }, config);
   if (config.click) {
-    for (const query of config.click) {
-      await Promise.all([
-        page.click(query),
-        page.waitForNavigation({
-          timeout: config.delay || 10000
-        }).catch(err => true)
-      ]);
-    }
+    await page.waitForNavigation({
+      timeout: config.delay || 10000,
+      waitUntil,
+      networkIdleTimeout
+    }).catch(err => true);
   }
   if (config.keys) {
     for (const key of config.keys) {
       await Promise.all([
         page.keyboard.press(key),
         page.waitForNavigation({
-          timeout: config.delay || 10000
+          timeout: config.delay || 10000,
+          waitUntil,
+          networkIdleTimeout
         }).catch(err => true)
       ]);
     }
   }
   console.log(`Populated ${name}: ${url}`);
   if (commander.debug) {
-    await page.screenshot({ path: `${name}.debug.png` });
+    await page.screenshot({ path: `${name}.after.debug.png` });
   }
 }
 

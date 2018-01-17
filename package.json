@@ -1,6 +1,6 @@
 {
   "name": "initpop",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "description": "Initialize web applications over a cli",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -23,7 +23,6 @@
     "commander": "^2.13.0",
     "js-yaml": "^3.10.0",
     "lodash": "^4.17.4",
-    "popform": "^0.1.2",
     "puppeteer": "^0.11.0"
   },
   "devDependencies": {

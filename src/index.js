@@ -24,8 +24,8 @@ new Promise((resolve, reject) => {
   return yaml.safeLoad(yamlData);
 }).then(async (config) => {
   const browser = await puppeteer.launch({
-    /* executablePath: process.env.CHROME_BIN || null,*/
-    /* args: ['--no-sandbox', '--headless', '--disable-gpu']*/
+    executablePath: process.env.CHROME_BIN || null,
+    args: ['--no-sandbox', '--headless', '--disable-gpu']
   });
   for (const pageInfo of config) {
     const page = await browser.newPage();

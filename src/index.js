@@ -131,6 +131,9 @@ async function popform({ name, url, page, config, networkIdleTimeout, waitUntil 
       }
     `)
   }, config);
+  if (!config.click && !config.keys && config.delay) {
+    await new Promise(r => setTimeout(r, config.delay));
+  }
   if (config.click) {
     await page.waitForNavigation({
       timeout: config.delay || 10000,

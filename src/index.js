@@ -27,53 +27,72 @@ new Promise((resolve, reject) => {
     executablePath: process.env.CHROME_BIN || null,
     args: ['--no-sandbox', '--headless', '--disable-gpu']
   });
-  for (const pageInfo of config) {
-    const page = await browser.newPage();
-    page.on('console', (log) => console.log(log));
-    const waitUntil = pageInfo.networkIdle ? 'networkidle' : 'load';
-    const networkIdleTimeout = Number(pageInfo.networkIdle) > 1 ? Number(pageInfo.networkIdle) : 1000;
-    await page.goto(pageInfo.url, {
-      waitUntil,
-      networkIdleTimeout
-    });
-    if (_.isArray(pageInfo.config)) {
-      let count = 0;
-      for (const config of pageInfo.config) {
-        await popform({
-          name: `${pageInfo.name}-${count}`,
-          url: pageInfo.url,
-          page,
-          waitUntil,
-          networkIdleTimeout,
-          config
-        });
-        count++;
-      }
-    } else {
-      await popform({
-        name: pageInfo.name,
-        url: pageInfo.url,
-        delay: pageInfo.delay,
-        page,
-        config: pageInfo.config
-      });
+  if (_.isArray(config)) {
+    for (const pageInfo of config) {
+      await initpop(pageInfo, browser);
     }
+  } else {
+    await initpop(config, browser);
   }
   await browser.close();
 }).catch((err) => {
   console.error(err);
 });
 
-async function popform({ name, url, page, config, networkIdleTimeout, waitUntil }) {
+async function initpop(pageInfo, browser) {
+  const page = await browser.newPage();
+  page.on('console', (log) => console.log(log));
+  const waitUntil = pageInfo.networkIdle ? 'networkidle' : 'load';
+  const networkIdleTimeout = Number(pageInfo.networkIdle) > 1 ? Number(pageInfo.networkIdle) : 1000;
+  await page.goto(pageInfo.url, {
+    waitUntil,
+    networkIdleTimeout
+  });
+  if (pageInfo.steps) {
+    let count = 0;
+    for (const step of pageInfo.steps) {
+      if (step.description) console.log(step.description);
+      await popform({
+        name: `${pageInfo.name}-${count}`,
+        url: pageInfo.url,
+        page,
+        waitUntil,
+        networkIdleTimeout,
+        step
+      });
+      count++;
+    }
+  } else {
+    if (pageInfo.description) console.log(pageInfo.description);
+    await popform({
+      name: pageInfo.name,
+      url: pageInfo.url,
+      page,
+      waitUntil,
+      networkIdleTimeout,
+      step: {
+        fields: pageInfo.fields,
+        click: pageInfo.click,
+        elements: pageInfo.elements,
+        keys: pageInfo.keys,
+        description: pageInfo.description,
+        delay: pageInfo.delay
+      }
+    });
+  }
+  console.log(pageInfo.message || `${pageInfo.name} initialized successfully`);
+}
+
+async function popform({ name, url, page, step, networkIdleTimeout, waitUntil }) {
   if (commander.debug) {
     await page.screenshot({ path: `${name}.before.debug.png` });
   }
-  await page.evaluate((config) => {
+  await page.evaluate((step) => {
     eval(`
       var contentDocument = document;
-      if (config.iframe) contentDocument = document.querySelector(config.iframe).contentDocument;
-      for (var key of Object.keys(config.fields || {})) {
-        field = config.fields[key];
+      if (step.iframe) contentDocument = document.querySelector(step.iframe).contentDocument;
+      for (var key of Object.keys(step.fields || {})) {
+        field = step.fields[key];
         for (var element of contentDocument.getElementsByName(key)) {
           element.focus();
           if (element.type === 'checkbox') {
@@ -98,7 +117,7 @@ async function popform({ name, url, page, config, networkIdleTimeout, waitUntil 
           element.blur();
         }
       }
-      for (var elementConfig of config.elements || []) {
+      for (var elementConfig of step.elements || []) {
         const element = contentDocument.querySelector(elementConfig.query);
         if (element) {
           if (elementConfig.field) element.focus();
@@ -120,41 +139,41 @@ async function popform({ name, url, page, config, networkIdleTimeout, waitUntil 
           }
         }
       }
-      if (config.click) {
-        if (typeof config.click === 'string') {
-          contentDocument.querySelector(config.click).click();
+      if (step.click) {
+        if (typeof step.click === 'string') {
+          contentDocument.querySelector(step.click).click();
         } else {
-          for (const query of config.click) {
+          for (const query of step.click) {
             contentDocument.querySelector(query).click();
           }
         }
       }
     `)
-  }, config);
-  if (!config.click && !config.keys && config.delay) {
-    await new Promise(r => setTimeout(r, config.delay));
+  }, step);
+  if (!step.click && !step.keys && step.delay) {
+    await new Promise(r => setTimeout(r, step.delay));
   }
-  if (config.click) {
+  if (step.click) {
     await page.waitForNavigation({
-      timeout: config.delay || 10000,
+      timeout: step.delay || 10000,
       waitUntil,
       networkIdleTimeout
     }).catch(err => true);
   }
-  if (config.keys) {
-    for (const key of config.keys) {
+  if (step.keys) {
+    for (const key of step.keys) {
       await Promise.all([
         page.keyboard.press(key),
         page.waitForNavigation({
-          timeout: config.delay || 10000,
+          timeout: step.delay || 10000,
           waitUntil,
           networkIdleTimeout
         }).catch(err => true)
       ]);
     }
   }
-  console.log(`Populated ${name}: ${url}`);
   if (commander.debug) {
+    console.log(`populated ${name}: ${url}`);
     await page.screenshot({ path: `${name}.after.debug.png` });
   }
 }

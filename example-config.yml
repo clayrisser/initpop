@@ -1,24 +1,4 @@
-- name: tao
-  url: http://localhost:8080/tao/install/
-  networkIdle: 1000
-  config:
-    - iframe: '#mainFrame'
-      click: '#submitForm'
-    - iframe: '#mainFrame'
-      fields:
-        instance_name: jamrizzi--interview
-        operated_by_name: 'JamRizzi Technologies'
-        operated_by_email: tech@jamrizzi.com
-      click: '#submitForm'
-    - iframe: '#mainFrame'
-      fields:
-        database_host: somehos
-        database_user: someuser
-        database_password: pass
-        database_named: somename
-      elements:
-        - query: '#database_overwrite'
-          checked: true
-        - query: '#sample_data'
-          checked: true
-      click: '#submitForm'
+name: google
+url: http://google.com
+fields:
+  q: howdy
